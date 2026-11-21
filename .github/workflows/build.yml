@@ -1,26 +1,423 @@
-name: Build Anchor Macro
+name: build
+
 on:
   push:
   workflow_dispatch:
+
+# Self-contained: this single file creates the whole Fabric 1.21.4 mod project and builds it.
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
+
       - uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: 8.12
-      - name: Unpack project
+          gradle-version: "8.12"
+
+      - name: Generate project files
         run: |
-          echo "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" | base64 -d | tar xz
-      - name: Build
-        working-directory: anchormacro
-        run: gradle build --no-daemon
-      - uses: actions/upload-artifact@v4
-        with:
-          name: anchormacro-jar
-          path: anchormacro/build/libs/*.jar
-          
+          cat > "build.gradle" <<'PVPEOF_0'
+          plugins {
+              id 'fabric-loom' version '1.9-SNAPSHOT'
+          }
+
+          version = project.mod_version
+          group = project.maven_group
+          base { archivesName = project.archives_base_name }
+
+          dependencies {
+              minecraft "com.mojang:minecraft:${project.minecraft_version}"
+              mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+              modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+              modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+          }
+
+          processResources {
+              inputs.property "version", project.version
+              filesMatching("fabric.mod.json") { expand "version": inputs.properties.version }
+          }
+
+          tasks.withType(JavaCompile).configureEach { it.options.release = 21 }
+
+          java {
+              withSourcesJar()
+              sourceCompatibility = JavaVersion.VERSION_21
+              targetCompatibility = JavaVersion.VERSION_21
+          }
+          PVPEOF_0
+          cat > "gradle.properties" <<'PVPEOF_1'
+          org.gradle.jvmargs=-Xmx2G
+          org.gradle.parallel=true
+          minecraft_version=1.21.4
+          yarn_mappings=1.21.4+build.8
+          loader_version=0.16.10
+          fabric_version=0.119.2+1.21.4
+          mod_version=1.0.0
+          maven_group=dev.pvputil
+          archives_base_name=pvp-utility
+          PVPEOF_1
+          mkdir -p "gradle/wrapper"
+          cat > "gradle/wrapper/gradle-wrapper.properties" <<'PVPEOF_2'
+          distributionBase=GRADLE_USER_HOME
+          distributionPath=wrapper/dists
+          distributionUrl=https\://services.gradle.org/distributions/gradle-8.12-bin.zip
+          zipStoreBase=GRADLE_USER_HOME
+          zipStorePath=wrapper/dists
+          PVPEOF_2
+          cat > "settings.gradle" <<'PVPEOF_3'
+          pluginManagement {
+              repositories {
+                  maven { name = 'Fabric'; url = 'https://maven.fabricmc.net/' }
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+          PVPEOF_3
+          mkdir -p "src/main/java/dev/pvputil/client"
+          cat > "src/main/java/dev/pvputil/client/PvpUtilClient.java" <<'PVPEOF_4'
+          package dev.pvputil.client;
+
+          import dev.pvputil.config.ModConfig;
+          import dev.pvputil.gui.PvpScreen;
+          import dev.pvputil.keybinds.Keybinds;
+          import dev.pvputil.modules.Modules;
+          import dev.pvputil.modules.PvpModule;
+          import net.fabricmc.api.ClientModInitializer;
+          import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+          import org.slf4j.Logger;
+          import org.slf4j.LoggerFactory;
+
+          public class PvpUtilClient implements ClientModInitializer {
+              public static final String MOD_ID = "pvputil";
+              public static final Logger LOG = LoggerFactory.getLogger(MOD_ID);
+
+              @Override
+              public void onInitializeClient() {
+                  ModConfig.load();
+                  Keybinds.init();
+                  Modules.init();
+
+                  // All module logic runs here, on the client thread.
+                  ClientTickEvents.END_CLIENT_TICK.register(mc -> {
+                      while (Keybinds.OPEN_GUI.wasPressed()) {
+                          if (mc.currentScreen == null) mc.setScreen(new PvpScreen(null));
+                      }
+                      for (PvpModule m : Modules.ALL) m.clientTick();
+                  });
+                  LOG.info("PvP Utility loaded with {} modules", Modules.ALL.size());
+              }
+          }
+          PVPEOF_4
+          mkdir -p "src/main/java/dev/pvputil/config"
+          cat > "src/main/java/dev/pvputil/config/ModConfig.java" <<'PVPEOF_5'
+          package dev.pvputil.config;
+
+          import com.google.gson.Gson;
+          import com.google.gson.GsonBuilder;
+          import dev.pvputil.client.PvpUtilClient;
+          import net.fabricmc.loader.api.FabricLoader;
+
+          import java.io.IOException;
+          import java.io.Reader;
+          import java.nio.file.Files;
+          import java.nio.file.Path;
+          import java.nio.file.StandardCopyOption;
+          import java.util.LinkedHashMap;
+          import java.util.Map;
+
+          /** JSON-backed settings (config/pvputil.json). Keybinds persist natively in options.txt. */
+          public final class ModConfig {
+              public static final class ModuleData {
+                  public boolean enabled = true;
+                  public Map<String, Integer> ints = new LinkedHashMap<>();
+                  public Map<String, Boolean> flags = new LinkedHashMap<>();
+              }
+
+              public boolean feedback = true;
+              public Map<String, ModuleData> modules = new LinkedHashMap<>();
+
+              private static ModConfig instance = new ModConfig();
+              private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
+              private static Path path() {
+                  return FabricLoader.getInstance().getConfigDir().resolve("pvputil.json");
+              }
+
+              public static ModConfig get() { return instance; }
+
+              public static ModuleData data(String id) {
+                  if (instance.modules == null) instance.modules = new LinkedHashMap<>();
+                  ModuleData d = instance.modules.computeIfAbsent(id, k -> new ModuleData());
+                  if (d.ints == null) d.ints = new LinkedHashMap<>();
+                  if (d.flags == null) d.flags = new LinkedHashMap<>();
+                  return d;
+              }
+
+              public static void load() {
+                  Path p = path();
+                  if (Files.exists(p)) {
+                      try (Reader r = Files.newBufferedReader(p)) {
+                          ModConfig c = GSON.fromJson(r, ModConfig.class);
+                          if (c != null) instance = c;
+                      } catch (Exception e) {
+                          PvpUtilClient.LOG.error("Could not read config, using defaults", e);
+                      }
+                  }
+                  save();
+              }
+
+              public static synchronized void save() {
+                  Path p = path();
+                  try {
+                      Files.createDirectories(p.getParent());
+                      Path tmp = p.resolveSibling("pvputil.json.tmp");
+                      Files.writeString(tmp, GSON.toJson(instance));
+                      Files.move(tmp, p, StandardCopyOption.REPLACE_EXISTING);
+                  } catch (IOException e) {
+                      PvpUtilClient.LOG.error("Could not save config", e);
+                  }
+              }
+          }
+          PVPEOF_5
+          mkdir -p "src/main/java/dev/pvputil/gui"
+          cat > "src/main/java/dev/pvputil/gui/PvpScreen.java" <<'PVPEOF_6'
+          package dev.pvputil.gui;
+
+          import dev.pvputil.config.ModConfig;
+          import dev.pvputil.keybinds.Keybinds;
+          import dev.pvputil.modules.BoolSetting;
+          import dev.pvputil.modules.IntSetting;
+          import dev.pvputil.modules.Modules;
+          import dev.pvputil.modules.PvpModule;
+          import net.fabricmc.loader.api.FabricLoader;
+          import net.minecraft.client.gui.DrawContext;
+          import net.minecraft.client.gui.screen.Screen;
+          import net.minecraft.client.option.KeyBinding;
+          import net.minecraft.client.util.InputUtil;
+          import net.minecraft.text.OrderedText;
+          import net.minecraft.text.Text;
+          import org.lwjgl.glfw.GLFW;
+
+          import java.util.ArrayList;
+          import java.util.HashMap;
+          import java.util.List;
+          import java.util.Map;
+
+          /** Immediate-mode configuration screen: sidebar navigation + animated rounded panels. */
+          public class PvpScreen extends Screen {
+              // Palette: dark blue / soft blue / near-black navy / light blue accent
+              static final int BG = 0xFF070B14, SIDEBAR = 0xFF0A1020, PANEL = 0xFF0E1630, PANEL_HI = 0xFF16224A;
+              static final int PRIMARY = 0xFF1E3FA0, SOFT = 0xFF6F93D8, ACCENT = 0xFF9AD1FF;
+              static final int TEXT = 0xFFFFFFFF, MUTED = 0xFF8696B5, WARN = 0xFFE5737F, OFF = 0xFF1C2542;
+
+              private static final String[] NAMES = {"Home", "Anchor Macro", "Double Anchor", "Safe Anchor Crouch",
+                      "Shield Breaker", "Fast XP", "Hit Crystal", "Settings"};
+
+              private record Hit(int x, int y, int w, int h, boolean content, Runnable action) {
+                  boolean in(double mx, double my) { return mx >= x && mx < x + w && my >= y && my < y + h; }
+              }
+
+              private final Screen parent;
+              private final List<Hit> hits = new ArrayList<>();
+              private final Map<String, Float> anim = new HashMap<>();
+              private int page;
+              private float pageAnim = 1f, fade = 1f, dt;
+              private int scroll, maxScroll;
+              private int mx, my;
+              private int cx, cy, cw, ch;
+              private boolean clipHover;
+              private long last = System.nanoTime();
+              private KeyBinding listening;
+              private String error;
+              private long errorUntil;
+
+              public PvpScreen(Screen parent) {
+                  super(Text.literal("PvP Utility"));
+                  this.parent = parent;
+              }
+
+              @Override public boolean shouldPause() { return false; }
+              @Override public void close() { client.setScreen(parent); }
+              @Override public void removed() { ModConfig.save(); }
+
+              private void setPage(int p) {
+                  if (p == page) return;
+                  page = p; pageAnim = 0f; scroll = 0; listening = null;
+              }
+
+              // ------------------------------------------------------------------ render
+              @Override
+              public void render(DrawContext c, int mouseX, int mouseY, float delta) {
+                  mx = mouseX; my = mouseY;
+                  long now = System.nanoTime();
+                  dt = Math.min(0.1f, (now - last) / 1_000_000_000f);
+                  last = now;
+                  pageAnim = Math.min(1f, pageAnim + dt * 5f);
+                  float e = 1f - (float) Math.pow(1f - pageAnim, 3);
+                  hits.clear();
+
+                  c.fill(0, 0, width, height, 0xC0020510);
+                  int ww = Math.min(width - 12, 600), wh = Math.min(height - 12, 360);
+                  int wx = (width - ww) / 2, wy = (height - wh) / 2;
+                  rounded(c, wx - 1, wy - 1, ww + 2, wh + 2, 9, 0xFF16275A);
+                  rounded(c, wx, wy, ww, wh, 8, BG);
+
+                  // ---- sidebar
+                  fade = 1f; clipHover = false;
+                  int sw = Math.min(140, ww / 4 + 30);
+                  rounded(c, wx + 5, wy + 5, sw, wh - 10, 6, SIDEBAR);
+                  rounded(c, wx + 14, wy + 14, 22, 22, 6, PRIMARY);
+                  c.drawText(textRenderer, "P", wx + 14 + (22 - textRenderer.getWidth("P")) / 2, wy + 21, ACCENT, false);
+                  c.drawText(textRenderer, "PvP Utility", wx + 42, wy + 15, TEXT, false);
+                  c.drawText(textRenderer, "Fabric client", wx + 42, wy + 26, MUTED, false);
+                  for (int i = 0; i < NAMES.length; i++) {
+                      int ny = wy + 46 + i * 22, nw = sw - 10;
+                      boolean act = page == i;
+                      float h = hv("nav" + i, hover(wx + 10, ny, nw, 20));
+                      rounded(c, wx + 10, ny, nw, 20, 5, act ? PRIMARY : mix(SIDEBAR, PANEL_HI, h));
+                      if (act) c.fill(wx + 10, ny + 4, wx + 12, ny + 16, ACCENT);
+                      c.drawText(textRenderer, NAMES[i], wx + 19 + (int) (h * 2), ny + 6, act ? TEXT : mix(MUTED, TEXT, h), false);
+                      final int idx = i;
+                      hit(wx + 10, ny, nw, 20, () -> setPage(idx));
+                  }
+                  c.drawText(textRenderer, "v" + modVersion(), wx + 14, wy + wh - 18, MUTED, false);
+
+                  // ---- content
+                  cx = wx + sw + 14; cy = wy + 10; cw = ww - sw - 24; ch = wh - 20;
+                  fade = e; clipHover = true;
+                  c.enableScissor(cx - 2, cy, cx + cw + 2, cy + ch);
+                  int y0 = cy - scroll + (int) ((1f - e) * 12f);
+                  int end;
+                  if (page == 0) end = drawHome(c, cx, y0, cw);
+                  else if (page == NAMES.length - 1) end = drawSettings(c, cx, y0, cw);
+                  else end = drawModule(c, Modules.ALL.get(page - 1), cx, y0, cw);
+                  c.disableScissor();
+                  maxScroll = Math.max(0, (end - y0) - ch + 6);
+                  scroll = Math.max(0, Math.min(maxScroll, scroll));
+              }
+
+              // ------------------------------------------------------------------ pages
+              private int drawHome(DrawContext c, int x, int y, int w) {
+                  box(c, x, y, 34, 34, 9, PRIMARY);
+                  scaled(c, "P", x + 12, y + 9, 2f, ACCENT);
+                  scaled(c, "PvP Utility", x + 44, y + 2, 1.5f, TEXT);
+                  txt(c, "Anchor, shield, XP and crystal helpers", x + 44, y + 22, MUTED);
+                  y += 46;
+
+                  String[][] info = {
+                          {"Mod version", modVersion()},
+                          {"Minecraft", version("minecraft")},
+                          {"Fabric Loader", version("fabricloader")},
+                          {"Fabric API", FabricLoader.getInstance().isModLoaded("fabric-api") ? "Loaded" : "Missing"}};
+                  int gap = 6, iw = (w - gap * 3) / 4;
+                  for (int i = 0; i < 4; i++) {
+                      int ix = x + i * (iw + gap);
+                      box(c, ix, y, iw, 32, 6, PANEL);
+                      txt(c, info[i][0], ix + 8, y + 6, MUTED);
+                      txt(c, info[i][1], ix + 8, y + 18, info[i][1].equals("Missing") ? WARN : TEXT);
+                  }
+                  y += 42;
+                  txt(c, "MODULES", x, y, SOFT);
+                  y += 14;
+
+                  int cwid = (w - 6) / 2;
+                  for (int i = 0; i < Modules.ALL.size(); i++) {
+                      PvpModule m = Modules.ALL.get(i);
+                      int bx = x + (i % 2) * (cwid + 6), by = y + (i / 2) * 44;
+                      float h = hv("card" + i, hover(bx, by, cwid, 38));
+                      box(c, bx, by, cwid, 38, 7, mix(PANEL, PANEL_HI, h));
+                      txt(c, m.name, bx + 10, by + 8, TEXT);
+                      txt(c, m.enabled() ? "Key: " + Keybinds.name(m.key) : "Disabled", bx + 10, by + 22, MUTED);
+                      final int idx = i + 1;
+                      hit(bx, by, cwid, 38, () -> setPage(idx));
+                      int tx = bx + cwid - 40, ty = by + 12;
+                      toggle(c, "ct" + i, tx, ty, m.enabled());
+                      hit(tx - 2, ty - 2, 34, 18, () -> m.setEnabled(!m.enabled()));
+                  }
+                  return y + ((Modules.ALL.size() + 1) / 2) * 44;
+              }
+
+              private int drawModule(DrawContext c, PvpModule m, int x, int y, int w) {
+                  scaled(c, m.name, x, y, 1.4f, TEXT);
+                  y += 20;
+                  for (OrderedText line : textRenderer.wrapLines(Text.literal(m.description), w)) {
+                      c.drawText(textRenderer, line, x, y, fa(MUTED), false);
+                      y += 10;
+                  }
+                  y += 6;
+
+                  final String tid = m.id + "_enabled";
+                  row(c, tid, x, y, w, "Enabled");
+                  toggle(c, tid + "t", x + w - 40, y + 6, m.enabled());
+                  hit(x, y, w, 26, () -> m.setEnabled(!m.enabled()));
+                  y += 30;
+
+                  y = keyRow(c, m.id + "_key", x, y, w, "Keybind", m.key);
+
+                  for (IntSetting s : m.ints) {
+                      y = s.slot() ? slotRow(c, m, s, x, y, w) : stepRow(c, m, s, x, y, w);
+                  }
+                  for (BoolSetting b : m.bools) {
+                      String id = m.id + "_" + b.key();
+                      row(c, id, x, y, w, b.label());
+                      toggle(c, id + "t", x + w - 40, y + 6, m.get(b));
+                      hit(x, y, w, 26, () -> m.set(b, !m.get(b)));
+                      y += 30;
+                  }
+                  y += 4;
+                  button(c, m.id + "_reset", x, y, 116, 20, "Reset to default", false, m::resetDefaults);
+                  return y + 26;
+              }
+
+              private int drawSettings(DrawContext c, int x, int y, int w) {
+                  scaled(c, "Settings", x, y, 1.4f, TEXT);
+                  y += 20;
+                  txt(c, "Global options. Module keybinds are saved by Minecraft (options.txt).", x, y, MUTED);
+                  y += 18;
+                  y = keyRow(c, "open_key", x, y, w, "Open menu key", Keybinds.OPEN_GUI);
+
+                  row(c, "fb", x, y, w, "Action-bar feedback messages");
+                  toggle(c, "fbt", x + w - 40, y + 6, ModConfig.get().feedback);
+                  hit(x, y, w, 26, () -> { ModConfig.get().feedback = !ModConfig.get().feedback; ModConfig.save(); });
+                  y += 34;
+
+                  button(c, "reset_all", x, y, 140, 20, "Reset all modules", false, () -> {
+                      for (PvpModule m : Modules.ALL) m.resetDefaults();
+                      Keybinds.reset(Keybinds.OPEN_GUI);
+                  });
+                  y += 30;
+                  txt(c, "Config file: .minecraft/config/pvputil.json", x, y, MUTED);
+                  return y + 16;
+              }
+
+              // ------------------------------------------------------------------ rows
+              private int keyRow(DrawContext c, String id, int x, int y, int w, String label, KeyBinding kb) {
+                  row(c, id, x, y, w, label);
+                  boolean lis = listening == kb;
+                  button(c, id + "b", x + w - 112, y + 4, 104, 18, lis ? "Press a key..." : Keybinds.name(kb), lis,
+                          () -> listening = (listening == kb ? null : kb));
+                  y += 30;
+                  if (lis) { txt(c, "ESC cancel  |  Del unbind", x + 4, y - 2, MUTED); y += 10; }
+                  if (error != null && System.currentTimeMillis() < errorUntil) { txt(c, error, x + 4, y - 2, WARN); y += 10; }
+                  return y;
+              }
+
+              private int slotRow(DrawContext c, PvpModule m, IntSetting s, int x, int y, int w) {
+                  String id = m.id + "_" + s.key();
+                  row(c, id, x, y, w, s.label());
+                  int cur = m.get(s), bx = x + w - 8 - 9 * 17 + 2;
+                  for (int i = 1; i <= 9; i++) {
+                      int px = bx + (i - 1) * 17;
+                      boolean sel = i == cur;
+                      float h = hv(id + i, hover(px, y + 5, 15, 16));
+                      box(c, px, y + 5, 15, 16, 4, sel ? SOFT : mix(0xFF18234A, 0xFF24366E, h));
+                      String t = String.valueOf(i);
+                      txt(c, t, px + (15 - textRenderer.getWidth(t)) / 2 + 1, y + 9, sel ? 0xFF06101F : mix(MUTED, TEXT, h));
+                      final int v = i;
+                      hit(px, y + 5, 15, 16, () -> m.set(s, v));
+                  }
+           
